@@ -127,7 +127,7 @@ class Conference
 
     public function __toString()
     {
-        return $this->getSlug();
+        return $this->getCity()." ".$this->getYear();
     }
 
     public function getSlug(): ?string
@@ -145,7 +145,7 @@ class Conference
     public function computeSlug(SluggerInterface $slugger)
     {
         if(!$this->Slug || '-' === $this->Slug) {
-            $this->Slug = (string) $slugger->Slug((string) $this)->lower();
+            $this->Slug = (string) $slugger->slug((string) $this)->lower();
         }
     }
 }
