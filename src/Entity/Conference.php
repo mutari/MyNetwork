@@ -6,9 +6,13 @@ use App\Repository\ConferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @ORM\Entity(repositoryClass=ConferenceRepository::class)
+ * @UniqueEntity("Slug")
  */
 class Conference
 {
@@ -38,6 +42,11 @@ class Conference
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="conference", orphanRemoval=true)
      */
     private $Comments;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     */
+    private $Slug;
 
     public function __construct()
     {
@@ -114,5 +123,29 @@ class Conference
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getSlug();
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->Slug;
+    }
+
+    public function setSlug(?string $Slug): self
+    {
+        $this->Slug = $Slug;
+
+        return $this;
+    }
+
+    public function computeSlug(SluggerInterface $slugger)
+    {
+        if(!$this->Slug || '-' === $this->Slug) {
+            $this->Slug = (string) $slugger->Slug((string) $this)->lower();
+        }
     }
 }

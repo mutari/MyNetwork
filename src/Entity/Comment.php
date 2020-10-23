@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Comment
 {
@@ -19,16 +20,20 @@ class Comment
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $Author;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank
      */
     private $Text;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Email
      */
     private $Email;
 
@@ -101,6 +106,14 @@ class Comment
         return $this;
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedAtValue()
+    {
+        $this->CreatedAt = new \DateTime();
+    }
+
     public function getConference(): ?Conference
     {
         return $this->conference;
@@ -123,5 +136,10 @@ class Comment
         $this->PhotoFilename = $PhotoFilename;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return strval("id: ".$this->getId()).", author: ".$this->getAuthor();
     }
 }
